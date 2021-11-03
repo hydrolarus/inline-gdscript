@@ -80,7 +80,6 @@ pub trait FromInlineGdscript<F: FnOnce(&mut Context)> {
     ) -> Self;
 }
 
-/// Assigning a `python!{}` block to a `Context` will run the Python code and capture the resulting context.
 impl<T: FromVariant, F: FnOnce(&mut Context)> FromInlineGdscript<F> for T {
     fn from_gdscript_macro(
         source: &'static str,
@@ -107,7 +106,6 @@ impl<T: FromVariant, F: FnOnce(&mut Context)> FromInlineGdscript<F> for T {
     }
 }
 
-/// Assigning a `python!{}` block to a `Context` will run the Python code and capture the resulting context.
 impl<F: FnOnce(&mut Context)> FromInlineGdscript<F> for Context {
     fn from_gdscript_macro(
         source: &'static str,
