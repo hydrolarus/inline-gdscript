@@ -89,23 +89,6 @@ impl EmbedGdscript {
                         self.gdscript.push_str(&name_str);
                         self.loc.column += name_str.chars().count() - 6 + 1;
                         self.variables.entry(name_str).or_insert(name);
-                    } else if x.as_char() == '#' && x.spacing() == Spacing::Joint {
-                        // Convert '##' to '//', because otherwise it's
-                        // impossible to use the Python operators '//' and '//='.
-                        match tokens.next() {
-                            Some(TokenTree::Punct(ref p)) if p.as_char() == '#' => {
-                                self.gdscript.push_str("//");
-                                self.loc.column += 2;
-                            }
-                            Some(TokenTree::Punct(p)) => {
-                                self.gdscript.push(x.as_char());
-                                self.gdscript.push(p.as_char());
-                                self.loc.column += 2;
-                            }
-                            _ => {
-                                unreachable!();
-                            }
-                        }
                     } else {
                         self.gdscript.push(x.as_char());
                         self.loc.column += 1;
@@ -116,17 +99,7 @@ impl EmbedGdscript {
                     self.loc = token.span().unwrap().end();
                 }
                 TokenTree::Literal(x) => {
-                    let s = x.to_string();
-                    // Remove space in prefixed strings like `f ".."`.
-                    // (`f".."` is not allowed in some versions+editions of Rust.)
-                    if s.starts_with('"')
-                        && self.gdscript.ends_with(' ')
-                        && self.gdscript[..self.gdscript.len() - 1]
-                            .ends_with(|c: char| c.is_ascii_alphabetic())
-                    {
-                        self.gdscript.pop();
-                    }
-                    self.gdscript += &s;
+                    self.gdscript += &x.to_string();
                     self.loc = token.span().unwrap().end();
                 }
             }
